@@ -1,0 +1,3 @@
+﻿  TimeClient.cpp
+C:\Users\3520708\Programming\NetworkCourse\Time - Client and Server\TimeClient\TimeClient\TimeClient.cpp(4,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  TimeClient.vcxproj -> C:\Users\3520708\Programming\NetworkCourse\Time - Client and Server\TimeClient\x64\Debug\TimeClient.exe
