@@ -4,6 +4,8 @@ void printUserMenu()
 {
     system("cls");
 
+    cout << "~~~~~~~~~~~~~~~ Main Menu ~~~~~~~~~~~~~~~" << endl;
+    cout << "Enter the number for the desired command" << endl;
     cout << "1.  Get Time - will return current date and time" << endl;
     cout << "2.  Get Time Without Date - will return only the current time  " << endl;
     cout << "3.  Get Time Since Epoch - will return seconds passed from 01.01.1970 until now" << endl;
@@ -17,7 +19,7 @@ void printUserMenu()
     cout << "11. Get Daylight Savings - will return if the daylight saving is on or off" << endl;
     cout << "12. Get Time Without Date In City - will return the time in chosen city" << endl;
     cout << "13. Measure Time Lap - will return the time past between client's requests (up to 3 minutes)" << endl;
-    cout << "0.  Exit" << endl;
+    cout << "To exit enter any other char" << endl;
 }
 
 void printCityMenu()
