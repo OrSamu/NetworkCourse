@@ -29,7 +29,7 @@ void getTimeSinceEpoch(char* sendBuff)
 	sprintf(sendBuff, "Time since epoch: %lld seconds", timeSinceEpoch);
 }
 
-void getTimeForMeasurement(char* sendBuff)
+void getTick(char* sendBuff)
 {
 	DWORD tick = GetTickCount();
 

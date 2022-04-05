@@ -138,7 +138,10 @@ void main()
 			getTimeSinceEpoch(sendBuff);
 			break;
 		case 4:
-			getTimeForMeasurement(sendBuff);
+			getTick(sendBuff);
+			break;
+		case 5:
+			getTick(sendBuff);
 			break;
 		default:
 			char answer[3];

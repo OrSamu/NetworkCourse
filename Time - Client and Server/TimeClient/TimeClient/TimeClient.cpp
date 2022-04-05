@@ -55,6 +55,9 @@ void main()
 		case 4:
 			getClientToServerDelayEstimation(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
 			break;
+		case 5:
+			measureRTT(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
+			break;
 		default :
 			sendSimpleRequest(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
 			break;

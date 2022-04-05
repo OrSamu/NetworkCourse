@@ -21,4 +21,4 @@ static time_t previousTimeLap;
 void getTime(char* sendBuff);
 void getTimeWithoutDate(char* sendBuff);
 void getTimeSinceEpoch(char* sendBuff);
-void getTimeForMeasurement(char* sendBuff);
+void getTick(char* sendBuff);

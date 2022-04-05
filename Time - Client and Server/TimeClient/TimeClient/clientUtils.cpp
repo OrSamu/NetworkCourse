@@ -145,3 +145,44 @@ void getClientToServerDelayEstimation(SOCKET connSocket, char* sendBuff, char* r
     cout << "The average client to server delay is: " << avgDelay << "ms" << endl;
     std::system("pause");
 }
+
+void measureRTT(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv)
+{
+    float clientToServerdelay = 0, avgDelay;
+    unsigned long valueWhenSent, valueWhenReceived;
+
+    for (int i = 0; i < 100; i++)
+    {
+        // The send function sends data on a connected socket.
+        // The buffer to be sent and its size are needed.
+        // The fourth argument is an idicator specifying the way in which the call is made (0 for default).
+        // The two last arguments hold the details of the server to communicate with. 
+        // NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
+        bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
+        valueWhenSent = GetTickCount();
+        if (SOCKET_ERROR == bytesSent)
+        {
+            cout << "UDP Client: Error at sendto(): " << WSAGetLastError() << endl;
+            closesocket(connSocket);
+            WSACleanup();
+            return;
+        }
+
+        // Gets the server's answer using simple recieve (no need to hold the server's address).
+        bytesRecv = recv(connSocket, recvBuff, 255, 0);
+        valueWhenReceived = GetTickCount();
+        if (SOCKET_ERROR == bytesRecv)
+        {
+            cout << "UDP Client: Error at recv(): " << WSAGetLastError() << endl;
+            closesocket(connSocket);
+            WSACleanup();
+            return;
+        }
+
+        clientToServerdelay = clientToServerdelay + (float)(valueWhenReceived - valueWhenSent);
+    }
+
+    avgDelay = clientToServerdelay / 100;
+    cout << "The average RTT delay is: " << avgDelay << "ms" << endl;
+    std::system("pause");
+}
