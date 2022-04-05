@@ -54,13 +54,6 @@ void closeClient()
 
 	system("cls");
 	cout << "Bye bye - press any key to exit the program" << endl;
-    while (waitForKeyPress)
-    {
-        if (_kbhit())
-        {
-            waitForKeyPress = false;
-        }
-    }
 
     return;
 }
@@ -68,4 +61,87 @@ void closeClient()
 bool isInputValid(int userInput)
 {
     return userInput >= USER_MENU_MIN_OPTION && userInput <= USER_MENU_MAX_OPTION;
+}
+
+void sendSimpleRequest(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv)
+{
+    // The send function sends data on a connected socket.
+    // The buffer to be sent and its size are needed.
+    // The fourth argument is an idicator specifying the way in which the call is made (0 for default).
+    // The two last arguments hold the details of the server to communicate with. 
+     // NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
+    bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
+    if (SOCKET_ERROR == bytesSent)
+    {
+        cout << "UDP Client: Error at sendto(): " << WSAGetLastError() << endl;
+        closesocket(connSocket);
+        WSACleanup();
+        return;
+    }
+    cout << "UDP Client: Sent: " << bytesSent << "/" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
+
+    // Gets the server's answer using simple recieve (no need to hold the server's address).
+    bytesRecv = recv(connSocket, recvBuff, 255, 0);
+    if (SOCKET_ERROR == bytesRecv)
+    {
+        cout << "UDP Client: Error at recv(): " << WSAGetLastError() << endl;
+        closesocket(connSocket);
+        WSACleanup();
+        return;
+    }
+
+    recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+    cout << "UDP Client: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+
+    std::system("pause");
+}
+
+void getClientToServerDelayEstimation(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv)
+{
+    float clientToServerdelay = 0, avgDelay;
+    unsigned long lastResponse, currentResponse;
+
+    for (int i = 0; i < 100; i++)
+    {
+        // The send function sends data on a connected socket.
+        // The buffer to be sent and its size are needed.
+        // The fourth argument is an idicator specifying the way in which the call is made (0 for default).
+        // The two last arguments hold the details of the server to communicate with. 
+        // NOTE: the last argument should always be the actual size of the client's data-structure (i.e. sizeof(sockaddr)).
+        bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
+        if (SOCKET_ERROR == bytesSent)
+        {
+            cout << "UDP Client: Error at sendto(): " << WSAGetLastError() << endl;
+            closesocket(connSocket);
+            WSACleanup();
+            return;
+        }
+    }
+
+    for (int i = 0; i < 100; i++)
+    {
+        // Gets the server's answer using simple recieve (no need to hold the server's address).
+        bytesRecv = recv(connSocket, recvBuff, 255, 0);
+        if (SOCKET_ERROR == bytesRecv)
+        {
+            cout << "UDP Client: Error at recv(): " << WSAGetLastError() << endl;
+            closesocket(connSocket);
+            WSACleanup();
+            return;
+        }
+
+        recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+        currentResponse = strtoul(recvBuff, nullptr, 0);
+
+        if (i > 0)
+        {
+            clientToServerdelay = clientToServerdelay + (float)(currentResponse - lastResponse);
+        }
+
+        lastResponse = currentResponse;
+    }
+
+    avgDelay = clientToServerdelay / 100;
+    cout << "The average client to server delay is: " << avgDelay << "ms" << endl;
+    std::system("pause");
 }

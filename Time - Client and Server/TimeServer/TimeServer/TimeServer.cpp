@@ -109,5 +109,61 @@ void main()
 
 		recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
 		cout << "UDP Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+
+		clientRequestNumber = atoi(recvBuff);
+
+		// Check if a time lapse has been started but has surpassed the maximum time lap duration
+		// If condition is met, end time lapse measurement without notifying client
+		if (timeLapInProgress)
+		{
+			time_t currentTime;
+
+			time(&currentTime);
+			if (currentTime - previousTimeLap > MAX_TIME_LAP_DURATION)
+			{
+				previousTimeLap = 0;
+				timeLapInProgress = false;
+			}
+		}
+
+		switch (clientRequestNumber)
+		{
+		case 1:
+			getTime(sendBuff);
+			break;
+		case 2:
+			getTimeWithoutDate(sendBuff);
+			break;
+		case 3:
+			getTimeSinceEpoch(sendBuff);
+			break;
+		case 4:
+			getTimeForMeasurement(sendBuff);
+			break;
+		default:
+			char answer[3];
+			_itoa(clientRequestNumber, answer, 10);
+			sprintf(sendBuff, "you assked for command number: %s", answer);
+			break;
+		}
+
+		// Sends the answer to the client, using the client address gathered
+		// by recvfrom. 
+		bytesSent = sendto(m_socket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&client_addr, client_addr_len);
+		if (SOCKET_ERROR == bytesSent)
+		{
+			cout << "UDP Server: Error at sendto(): " << WSAGetLastError() << endl;
+			closesocket(m_socket);
+			WSACleanup();
+			return;
+		}
+
+		cout << "UDP Server: Sent: " << bytesSent << "\\" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
+
 	}
+
+	// Closing connections and Winsock.
+	cout << "Time Server: Closing Connection.\n";
+	closesocket(m_socket);
+	WSACleanup();
 }

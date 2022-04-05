@@ -7,7 +7,7 @@ void main()
 	WSAData wsaData;
 	if (NO_ERROR != WSAStartup(MAKEWORD(2, 2), &wsaData))
 	{
-		cout << "UDP Client: Error at WSAStartup()\n";
+		std::cout << "UDP Client: Error at WSAStartup()\n";
 		return;
 	}
 
@@ -17,7 +17,7 @@ void main()
 	SOCKET connSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (INVALID_SOCKET == connSocket)
 	{
-		cout << "UDP Client: Error at socket(): " << WSAGetLastError() << endl;
+		std::cout << "UDP Client: Error at socket(): " << WSAGetLastError() << endl;
 		WSACleanup();
 		return;
 	}
@@ -38,6 +38,7 @@ void main()
 	char recvBuff[255];
 	bool keepClientAlive = true;
 	bool soloRequest;
+	bool waitForClearingScreen = true;
 
 	while (keepClientAlive)
 	{
@@ -51,39 +52,18 @@ void main()
 			keepClientAlive = false;
 			closeClient();
 			break;
-
+		case 4:
+			getClientToServerDelayEstimation(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
+			break;
 		default :
-			cout << "user selection was " << usersRequest << endl;
+			sendSimpleRequest(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
 			break;
 		}
-
-		bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
-		if (SOCKET_ERROR == bytesSent)
-		{
-			cout << "UDP Client: Error at sendto(): " << WSAGetLastError() << endl;
-			closesocket(connSocket);
-			WSACleanup();
-			return;
-		}
-		cout << "UDP Client: Sent: " << bytesSent << "/" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
-
-		/*// Gets the server's answer using simple recieve (no need to hold the server's address).
-		bytesRecv = recv(connSocket, recvBuff, 255, 0);
-		if (SOCKET_ERROR == bytesRecv)
-		{
-			cout << "UDP Client: Error at recv(): " << WSAGetLastError() << endl;
-			closesocket(connSocket);
-			WSACleanup();
-			return;
-		}
-
-		recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
-		cout << "UDP Client: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";*/
 	}
 
 	// Closing connections and Winsock.
-	cout << "Time Client: Closing Connection.\n";
+	std::cout << "Time Client: Closing Connection.\n";
 	closesocket(connSocket);
 
-	system("pause");
+	std::system("pause");
 }

@@ -21,3 +21,6 @@ void printCityMenu();
 int getUserRequest();
 void closeClient();
 bool isInputValid(int userInput);
+void sendSimpleRequest(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv);
+void getClientToServerDelayEstimation(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv);
+
