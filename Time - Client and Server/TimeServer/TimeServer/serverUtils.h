@@ -22,3 +22,7 @@ void getTime(char* sendBuff);
 void getTimeWithoutDate(char* sendBuff);
 void getTimeSinceEpoch(char* sendBuff);
 void getTick(char* sendBuff);
+void GetTimeWithoutDateOrSeconds(char* sendBuff);
+void GetYear(char* sendBuff);
+void getMonthAndDay(char* sendBuff);
+void getSecondsSinceBeginingOfMonth(char* sendBuff);

@@ -143,6 +143,18 @@ void main()
 		case 5:
 			getTick(sendBuff);
 			break;
+		case 6:
+			GetTimeWithoutDateOrSeconds(sendBuff);
+			break;
+		case 7:
+			GetYear(sendBuff);
+			break;
+		case 8:
+			getMonthAndDay(sendBuff);
+			break;
+		case 9:
+			getSecondsSinceBeginingOfMonth(sendBuff);
+			break;
 		default:
 			char answer[3];
 			_itoa(clientRequestNumber, answer, 10);
