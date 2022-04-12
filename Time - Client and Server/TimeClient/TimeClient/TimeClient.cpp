@@ -42,7 +42,8 @@ void main()
 
 	while (keepClientAlive)
 	{
-		int usersRequest = getUserRequest();
+		printUserMenu();
+		int usersRequest = getUserRequest(USER_MENU_MIN_OPTION, USER_MENU_MAX_OPTION);
 
 		sprintf_s(sendBuff, "%d", usersRequest);
 		soloRequest = false;
@@ -57,6 +58,9 @@ void main()
 			break;
 		case 5:
 			measureRTT(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
+			break;
+		case 12:
+			getTimeWithoutDateInCity(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);
 			break;
 		default :
 			sendSimpleRequest(connSocket, sendBuff, recvBuff, server, bytesSent, bytesRecv);

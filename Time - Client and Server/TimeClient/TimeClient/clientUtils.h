@@ -18,10 +18,10 @@ using namespace std;
 
 void printUserMenu();
 void printCityMenu();
-int getUserRequest();
+int getUserRequest(int minReq, int maxReq);
 void closeClient();
-bool isInputValid(int userInput);
+bool isInputValid(int userInput, int minReq, int maxReq);
 void sendSimpleRequest(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv);
 void getClientToServerDelayEstimation(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv);
 void measureRTT(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv);
-
+void getTimeWithoutDateInCity(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv);

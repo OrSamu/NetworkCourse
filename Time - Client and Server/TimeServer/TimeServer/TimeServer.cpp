@@ -86,6 +86,8 @@ void main()
 	char sendBuff[255];
 	char recvBuff[255];
 	int clientRequestNumber;
+	bool inTimeLap = false;
+	DWORD timeLapStart;
 
 	// Get client's requests and answer them.
 	// The recvfrom function receives a datagram and stores the source address.
@@ -98,6 +100,18 @@ void main()
 
 	while (true)
 	{
+		// If time lap is active & hasn't been called again in 3 minutes it will be reasterted
+		if (timeLapInProgress)
+		{
+			DWORD currentTime = GetTickCount();
+
+			if (currentTime - timeLapStart > MAX_TIME_LAP_DURATION)
+			{
+				previousTimeLap = 0;
+				timeLapInProgress = false;
+			}
+		}
+
 		bytesRecv = recvfrom(m_socket, recvBuff, 255, 0, &client_addr, &client_addr_len);
 		if (SOCKET_ERROR == bytesRecv)
 		{
@@ -111,20 +125,6 @@ void main()
 		cout << "UDP Server: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
 
 		clientRequestNumber = atoi(recvBuff);
-
-		// Check if a time lapse has been started but has surpassed the maximum time lap duration
-		// If condition is met, end time lapse measurement without notifying client
-		if (timeLapInProgress)
-		{
-			time_t currentTime;
-
-			time(&currentTime);
-			if (currentTime - previousTimeLap > MAX_TIME_LAP_DURATION)
-			{
-				previousTimeLap = 0;
-				timeLapInProgress = false;
-			}
-		}
 
 		switch (clientRequestNumber)
 		{
@@ -144,16 +144,28 @@ void main()
 			getTick(sendBuff);
 			break;
 		case 6:
-			GetTimeWithoutDateOrSeconds(sendBuff);
+			getTimeWithoutDateOrSeconds(sendBuff);
 			break;
 		case 7:
-			GetYear(sendBuff);
+			getYear(sendBuff);
 			break;
 		case 8:
 			getMonthAndDay(sendBuff);
 			break;
 		case 9:
 			getSecondsSinceBeginingOfMonth(sendBuff);
+			break;
+		case 10:
+			getWeekOfYear(sendBuff);
+			break;
+		case 11:
+			getDaylightSavings(sendBuff);
+			break;
+		case 12:
+			getTimeWithoutDateInCity(recvBuff, sendBuff, m_socket, client_addr, client_addr_len);
+			break;
+		case 13:
+			measureTimeLap(sendBuff, &inTimeLap, &timeLapStart);
 			break;
 		default:
 			char answer[3];

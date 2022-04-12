@@ -24,20 +24,24 @@ void printUserMenu()
 
 void printCityMenu()
 {
-	cout << "city menu is working" << endl;
+    cout << "***** City Menu *****" << endl;
+    cout << "Enter the number for the desired city" << endl;
+    cout << "1.  Tokyo (Japan)" << endl;
+    cout << "2.  Melbourne (Australia)" << endl;
+    cout << "3.  San Francisco (USA)" << endl;
+    cout << "4.  Porto (Portugal)" << endl;
+    cout << "5.  Other (UTC General Time)" << endl;
 }
 
-int getUserRequest()
+int getUserRequest(int minReq, int maxReq)
 {
     int userInput;
     bool keepCheckingForValidation = true;
 
-	printUserMenu();
-
     while (keepCheckingForValidation)
     {
         cin >> userInput;
-        isInputValid(userInput) ? keepCheckingForValidation = false : keepCheckingForValidation = true;
+        isInputValid(userInput, minReq, maxReq) ? keepCheckingForValidation = false : keepCheckingForValidation = true;
         if (keepCheckingForValidation)
         {
             cout << "Invalid selection, please try again" << endl;
@@ -58,9 +62,9 @@ void closeClient()
     return;
 }
 
-bool isInputValid(int userInput)
+bool isInputValid(int userInput, int minReq, int maxReq)
 {
-    return userInput >= USER_MENU_MIN_OPTION && userInput <= USER_MENU_MAX_OPTION;
+    return userInput >= minReq && userInput <= maxReq;
 }
 
 void sendSimpleRequest(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv)
@@ -184,5 +188,48 @@ void measureRTT(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in s
 
     avgDelay = clientToServerdelay / 100;
     cout << "The average RTT delay is: " << avgDelay << "ms" << endl;
+    std::system("pause");
+}
+
+void getTimeWithoutDateInCity(SOCKET connSocket, char* sendBuff, char* recvBuff, sockaddr_in server, int& bytesSent, int& bytesRecv)
+{
+    bytesSent = sendto(connSocket, sendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
+    if (SOCKET_ERROR == bytesSent)
+    {
+        cout << "UDP Client: Error at sendto(): " << WSAGetLastError() << endl;
+        closesocket(connSocket);
+        WSACleanup();
+        return;
+    }
+    cout << "UDP Client: Sent: " << bytesSent << "/" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
+
+    printCityMenu();
+
+    int usersRequest = getUserRequest(CITY_MENU_MIN_OPTION, CITY_MENU_MAX_OPTION);
+    char newSendBuff[255];
+
+    sprintf_s(newSendBuff, "%d", usersRequest);
+    bytesSent = sendto(connSocket, newSendBuff, (int)strlen(sendBuff), 0, (const sockaddr*)&server, sizeof(server));
+    if (SOCKET_ERROR == bytesSent)
+    {
+        cout << "UDP Client: Error at sendto(): " << WSAGetLastError() << endl;
+        closesocket(connSocket);
+        WSACleanup();
+        return;
+    }
+    cout << "UDP Client: Sent: " << bytesSent << "/" << strlen(sendBuff) << " bytes of \"" << sendBuff << "\" message.\n";
+
+    bytesRecv = recv(connSocket, recvBuff, 255, 0);
+    if (SOCKET_ERROR == bytesRecv)
+    {
+        cout << "UDP Client: Error at recv(): " << WSAGetLastError() << endl;
+        closesocket(connSocket);
+        WSACleanup();
+        return;
+    }
+
+    recvBuff[bytesRecv] = '\0'; //add the null-terminating to make it a string
+    cout << "UDP Client: Recieved: " << bytesRecv << " bytes of \"" << recvBuff << "\" message.\n";
+
     std::system("pause");
 }
